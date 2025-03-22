@@ -1,7 +1,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { PaperPlaneIcon } from 'lucide-react';
+import { Send } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ChatInputProps {
@@ -79,7 +79,7 @@ export const ChatInput = ({ onSendMessage, isLoading }: ChatInputProps) => {
             message.trim() === '' ? "opacity-70" : "opacity-100"
           )}
         >
-          <PaperPlaneIcon className="h-5 w-5" />
+          <Send className="h-5 w-5" />
         </Button>
       </div>
     </form>
