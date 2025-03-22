@@ -4,19 +4,7 @@ import { cn } from '@/lib/utils';
 import { ChatInput } from './ChatInput';
 import { ChatMessage, TypingIndicator, type MessageType } from './ChatMessage';
 import { useToast } from '@/components/ui/use-toast';
-
-// Sample responses for the chatbot - in a real app, this would be replaced with an actual API call
-const sampleResponses = [
-  "I'm here to help answer your questions. What would you like to know?",
-  "That's an interesting question. Let me think about that for a moment...",
-  "I understand what you're asking. Here's what I can tell you about that.",
-  "Thanks for sharing that with me. Is there anything specific you'd like to discuss?",
-  "I appreciate your question. Based on what I know, here's my response.",
-  "That's a great point! I'd like to add a few thoughts on this topic.",
-  "I'm not entirely sure about that, but here's what I can tell you based on my knowledge.",
-  "Excellent question! Let me provide you with some information on that.",
-  "I see what you're asking. Let me break this down for you in simple terms."
-];
+import { sendChatMessage } from '@/services/apiService';
 
 export const ChatInterface = () => {
   const [messages, setMessages] = useState<MessageType[]>([
@@ -29,6 +17,7 @@ export const ChatInterface = () => {
   ]);
   
   const [isTyping, setIsTyping] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -43,8 +32,11 @@ export const ChatInterface = () => {
     }
   };
 
-  // Simulate sending a message to the AI and getting a response
-  const handleSendMessage = (text: string) => {
+  // Send a message to the AWS API Gateway and handle the response
+  const handleSendMessage = async (text: string) => {
+    // Reset any previous errors
+    setError(null);
+    
     // Add user message
     const userMessage: MessageType = {
       id: Date.now().toString(),
@@ -55,33 +47,45 @@ export const ChatInterface = () => {
     
     setMessages(prev => [...prev, userMessage]);
     
-    // Simulate AI typing
+    // Show typing indicator
     setIsTyping(true);
     
-    // Simulate AI response after a delay
-    setTimeout(() => {
-      setIsTyping(false);
+    try {
+      // Call the AWS API Gateway
+      const response = await sendChatMessage(text);
       
-      // Get random response from sample responses
-      const randomIndex = Math.floor(Math.random() * sampleResponses.length);
-      const botResponse = sampleResponses[randomIndex];
-      
+      // Create bot message from API response
       const botMessage: MessageType = {
         id: (Date.now() + 1).toString(),
-        text: botResponse,
+        text: response.message,
         sender: 'bot',
-        timestamp: new Date()
+        timestamp: new Date(response.timestamp) || new Date()
       };
       
+      // Hide typing indicator and add bot message
+      setIsTyping(false);
       setMessages(prev => [...prev, botMessage]);
       
-      // Show toast when new message arrives (optional)
+      // Show toast notification
       toast({
         title: "New message",
         description: "AI assistant has responded to your query",
         duration: 2000,
       });
-    }, 1500 + Math.random() * 1000); // Random delay between 1.5-2.5 seconds
+    } catch (err) {
+      // Handle errors
+      setIsTyping(false);
+      setError("Sorry, I couldn't process your request. Please try again.");
+      
+      toast({
+        title: "Error",
+        description: "Failed to get a response from the assistant",
+        variant: "destructive",
+        duration: 3000,
+      });
+      
+      console.error('Error in handleSendMessage:', err);
+    }
   };
 
   return (
@@ -103,6 +107,12 @@ export const ChatInterface = () => {
           ))}
           
           {isTyping && <TypingIndicator />}
+          
+          {error && (
+            <div className="p-3 mb-2 text-red-500 bg-red-100 rounded-lg">
+              {error}
+            </div>
+          )}
           
           {/* This div is used to scroll to the bottom */}
           <div ref={messagesEndRef} />
