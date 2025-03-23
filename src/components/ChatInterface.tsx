@@ -52,7 +52,7 @@ export const ChatInterface = () => {
     try {
       // Call the AWS API Gateway with the structured request format
       const response = await sendChatMessage(text);
-      
+      console.log(response);
       // Create bot message from API response
       const botMessage: MessageType = {
         id: (Date.now() + 1).toString(),
