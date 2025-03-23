@@ -48,7 +48,7 @@ export const ChatMessage = ({ message, isLatest }: ChatMessageProps) => {
           clearInterval(timer);
           setIsTyping(false);
         }
-      }, Math.random() * 40 + 20);
+      }, Math.random() * 20 + 10);
       
       return () => clearInterval(timer);
     } else {
