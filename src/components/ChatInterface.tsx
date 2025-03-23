@@ -56,7 +56,7 @@ export const ChatInterface = () => {
       // Create bot message from API response
       const botMessage: MessageType = {
         id: (Date.now() + 1).toString(),
-        text: response[0],
+        text: response[0].Object,
         sender: 'bot',
         timestamp: new Date() // Use current date as fallback
       };
