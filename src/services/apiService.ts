@@ -11,14 +11,34 @@ export interface ChatResponse {
   timestamp: string;
 }
 
+export interface ApiRequestParameters {
+  name: string;
+  value: string;
+}
+
 export const sendChatMessage = async (message: string): Promise<ChatResponse> => {
   try {
+    // Structure the request body according to the required format
+    const requestBody = {
+      apiPath: "/weather",
+      actionGroup: "get_weather",
+      httpMethod: "GET",
+      parameters: [
+        {
+          name: "city",
+          value: message // Using the message as the city value
+        }
+      ],
+      sessionAttributes: {},
+      promptSessionAttributes: {}
+    };
+
     const response = await fetch(API_ENDPOINT, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ message }),
+      body: JSON.stringify(requestBody),
     });
 
     if (!response.ok) {

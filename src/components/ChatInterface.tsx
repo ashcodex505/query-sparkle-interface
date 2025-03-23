@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { ChatInput } from './ChatInput';
@@ -51,7 +50,7 @@ export const ChatInterface = () => {
     setIsTyping(true);
     
     try {
-      // Call the AWS API Gateway
+      // Call the AWS API Gateway with the structured request format
       const response = await sendChatMessage(text);
       
       // Create bot message from API response
