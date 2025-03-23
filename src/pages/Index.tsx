@@ -9,7 +9,7 @@ const Index = () => {
       </div>
       
       <footer className="mt-6 text-sm text-muted-foreground text-center">
-        <p>Designed with simplicity and elegance in mind.</p>
+        <p>Designed with simplicity and convenience.</p>
       </footer>
     </div>
   );
