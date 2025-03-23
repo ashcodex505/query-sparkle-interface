@@ -7,8 +7,8 @@
 const API_ENDPOINT = "https://0nerb7x9f9.execute-api.us-west-2.amazonaws.com/Part2WebScrape/bedrock-llm";
 
 export interface ChatResponse {
-  statusCode: number;
-  body: string;
+  message: string;
+  timestamp: string;
 }
 
 export interface ApiRequestParameters {
@@ -19,19 +19,22 @@ export interface ApiRequestParameters {
 export const sendChatMessage = async (message: string): Promise<ChatResponse> => {
   try {
     // Structure the request body according to the required format
+    // const requestBody = {
+    //   apiPath: "/weather",
+    //   actionGroup: "get_weather",
+    //   httpMethod: "GET",
+    //   parameters: [
+    //     {
+    //       name: "city",
+    //       value: message // Using the message as the city value
+    //     }
+    //   ],
+    //   sessionAttributes: {},
+    //   promptSessionAttributes: {}
+    // };
     const requestBody = {
-      "apiPath": "/weather",
-      "actionGroup": "get_weather",
-      "httpMethod": "GET",
-      "parameters": [
-        {
-          "name": "city",
-          "value": message // Using the message as the city value
-        }
-      ],
-      "sessionAttributes": {},
-      "promptSessionAttributes": {}
-    };
+      "body": "{\"query\": \"{message}\"}"
+    }
 
     const response = await fetch(API_ENDPOINT, {
       method: 'POST',
