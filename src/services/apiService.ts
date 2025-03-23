@@ -33,7 +33,9 @@ export const sendChatMessage = async (message: string): Promise<ChatResponse> =>
     //   promptSessionAttributes: {}
     // };
     const requestBody = {
-      "body": "{\"query\": \"{message}\"}"
+      "body": {
+        "prompt": {message}
+      }
     }
 
     const response = await fetch(API_ENDPOINT, {
