@@ -34,7 +34,7 @@ export const sendChatMessage = async (message: string): Promise<ChatResponse> =>
     // };
     const requestBody = {
       "body": {
-        "prompt": {message}
+        "prompt": message
       }
     }
 
