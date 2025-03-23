@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { ChatInput } from './ChatInput';
@@ -56,7 +57,14 @@ export const ChatInterface = () => {
             ? JSON.parse(response.body) 
             : response.body;
             
-          messageText = bodyContent.response || "No message in response";
+          // Check if there's an error message in the response
+          if (bodyContent.error) {
+            messageText = `Error: ${bodyContent.error}`;
+          } else if (bodyContent.response) {
+            messageText = bodyContent.response;
+          } else {
+            messageText = "No message content in response";
+          }
         }
       } catch (parseError) {
         console.error('Error parsing response body:', parseError);
@@ -70,25 +78,23 @@ export const ChatInterface = () => {
         timestamp: new Date()
       };
       
-      try {
-        if (response.timestamp) {
-          const responseDate = new Date(response.timestamp);
-          if (!isNaN(responseDate.getTime())) {
-            botMessage.timestamp = responseDate;
-          }
-        }
-      } catch (err) {
-        console.error('Error parsing timestamp from response:', err);
-      }
-      
       setIsTyping(false);
       setMessages(prev => [...prev, botMessage]);
       
-      toast({
-        title: "New message",
-        description: "AI assistant has responded to your query",
-        duration: 2000,
-      });
+      if (response.statusCode === 200) {
+        toast({
+          title: "New message",
+          description: "AI assistant has responded to your query",
+          duration: 2000,
+        });
+      } else {
+        toast({
+          title: "Warning",
+          description: "Received a response with issues",
+          variant: "destructive",
+          duration: 3000,
+        });
+      }
     } catch (err) {
       setIsTyping(false);
       setError("Sorry, I couldn't process your request. Please try again.");
