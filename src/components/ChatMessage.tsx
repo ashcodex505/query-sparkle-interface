@@ -6,7 +6,7 @@ export type MessageType = {
   id: string;
   text: string;
   sender: 'user' | 'bot';
-  timestamp: Date;
+  timestamp: Date | string;
 };
 
 interface ChatMessageProps {
@@ -27,12 +27,29 @@ export const ChatMessage = ({ message, isLatest }: ChatMessageProps) => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Format time to be displayed
-  const formattedTime = new Intl.DateTimeFormat('en-US', {
-    hour: 'numeric',
-    minute: 'numeric',
-    hour12: true
-  }).format(message.timestamp);
+  // Format time to be displayed - handle both Date objects and string timestamps
+  const getFormattedTime = () => {
+    try {
+      // Convert string timestamp to Date if necessary
+      const dateObject = message.timestamp instanceof Date ? 
+        message.timestamp : 
+        new Date(message.timestamp);
+      
+      // Check if the date is valid
+      if (isNaN(dateObject.getTime())) {
+        return 'Just now'; // Fallback for invalid dates
+      }
+
+      return new Intl.DateTimeFormat('en-US', {
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: true
+      }).format(dateObject);
+    } catch (error) {
+      console.error('Error formatting timestamp:', error);
+      return 'Just now'; // Fallback for any errors
+    }
+  };
 
   return (
     <div
@@ -57,7 +74,7 @@ export const ChatMessage = ({ message, isLatest }: ChatMessageProps) => {
           "text-xs mt-1 opacity-60 text-right",
           isUser ? "text-white/80" : "text-foreground/60"
         )}>
-          {formattedTime}
+          {getFormattedTime()}
         </div>
       </div>
     </div>

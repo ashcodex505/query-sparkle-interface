@@ -58,8 +58,22 @@ export const ChatInterface = () => {
         id: (Date.now() + 1).toString(),
         text: response.message,
         sender: 'bot',
-        timestamp: new Date(response.timestamp) || new Date()
+        timestamp: new Date() // Use current date as fallback
       };
+      
+      // Try to use the timestamp from response if it exists and is valid
+      try {
+        if (response.timestamp) {
+          const responseDate = new Date(response.timestamp);
+          // Check if valid date
+          if (!isNaN(responseDate.getTime())) {
+            botMessage.timestamp = responseDate;
+          }
+        }
+      } catch (err) {
+        console.error('Error parsing timestamp from response:', err);
+        // Keep the fallback timestamp
+      }
       
       // Hide typing indicator and add bot message
       setIsTyping(false);
