@@ -36,13 +36,13 @@ export const ChatMessage = ({ message, isLatest }: ChatMessageProps) => {
       setIsTyping(true);
       setDisplayedText('');
       
-      const text = message.text;
+      const text = message.text.trim(); // Trim to remove any extra spaces
       let currentIndex = 0;
       
       // Random typing speed between 20-60ms for natural feel
       const timer = setInterval(() => {
         if (currentIndex < text.length) {
-          setDisplayedText(prev => prev + text[currentIndex]);
+          setDisplayedText(prev => text.substring(0, currentIndex + 1));
           currentIndex++;
         } else {
           clearInterval(timer);
@@ -53,7 +53,7 @@ export const ChatMessage = ({ message, isLatest }: ChatMessageProps) => {
       return () => clearInterval(timer);
     } else {
       // For user messages or old bot messages, show full text immediately
-      setDisplayedText(message.text);
+      setDisplayedText(message.text.trim()); // Trim to remove any extra spaces
     }
   }, [message.text, message.sender, isLatest]);
 
