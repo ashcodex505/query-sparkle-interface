@@ -4,7 +4,7 @@
  */
 
 // Replace this URL with your actual AWS API Gateway endpoint
-const API_ENDPOINT = "https://api.example.com/chat";
+const API_ENDPOINT = "https://c5fyrfqqpj.execute-api.us-west-2.amazonaws.com/hackathonUA/webScrape";
 
 export interface ChatResponse {
   message: string;
