@@ -16,9 +16,11 @@ interface ChatMessageProps {
 
 export const ChatMessage = ({ message, isLatest }: ChatMessageProps) => {
   const [visible, setVisible] = useState(false);
+  const [displayedText, setDisplayedText] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
   const isUser = message.sender === 'user';
   
-  // Animation effect
+  // Animation effect for message entry
   useEffect(() => {
     const timer = setTimeout(() => {
       setVisible(true);
@@ -26,6 +28,34 @@ export const ChatMessage = ({ message, isLatest }: ChatMessageProps) => {
     
     return () => clearTimeout(timer);
   }, []);
+
+  // Streaming text effect for bot messages
+  useEffect(() => {
+    // Only apply streaming effect to bot messages and the latest message
+    if (message.sender === 'bot' && isLatest && message.text) {
+      setIsTyping(true);
+      setDisplayedText('');
+      
+      const text = message.text;
+      let currentIndex = 0;
+      
+      // Random typing speed between 20-60ms for natural feel
+      const timer = setInterval(() => {
+        if (currentIndex < text.length) {
+          setDisplayedText(prev => prev + text[currentIndex]);
+          currentIndex++;
+        } else {
+          clearInterval(timer);
+          setIsTyping(false);
+        }
+      }, Math.random() * 40 + 20);
+      
+      return () => clearInterval(timer);
+    } else {
+      // For user messages or old bot messages, show full text immediately
+      setDisplayedText(message.text);
+    }
+  }, [message.text, message.sender, isLatest]);
 
   // Format time to be displayed - handle both Date objects and string timestamps
   const getFormattedTime = () => {
@@ -68,7 +98,8 @@ export const ChatMessage = ({ message, isLatest }: ChatMessageProps) => {
         )}
       >
         <div className="mb-1">
-          {message.text}
+          {isUser ? message.text : displayedText}
+          {isTyping && !isUser && <span className="cursor blink">|</span>}
         </div>
         <div className={cn(
           "text-xs mt-1 opacity-60 text-right",

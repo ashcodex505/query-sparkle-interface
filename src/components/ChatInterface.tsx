@@ -53,18 +53,37 @@ export const ChatInterface = () => {
       // Call the AWS API Gateway with the structured request format
       const response = await sendChatMessage(text);
       console.log(response);
-      const parsedBody = JSON.parse(response.body);
+      
+      // Handle API response which has its response text in a body property
+      let responseText = "Sorry, I couldn't understand that.";
+      
+      if (response && typeof response === 'object') {
+        try {
+          // Check if body exists and parse it
+          if (typeof response.body === 'string') {
+            const parsedBody = JSON.parse(response.body);
+            if (parsedBody.response) {
+              responseText = parsedBody.response;
+            } else if (parsedBody.error) {
+              responseText = `Error: ${parsedBody.error}`;
+            }
+          }
+        } catch (err) {
+          console.error('Error parsing response body:', err);
+        }
+      }
+      
       // Create bot message from API response
       const botMessage: MessageType = {
         id: (Date.now() + 1).toString(),
-        text: parsedBody.response,
+        text: responseText,
         sender: 'bot',
         timestamp: new Date() // Use current date as fallback
       };
       
       // Try to use the timestamp from response if it exists and is valid
       try {
-        if (response.timestamp) {
+        if (response && response.timestamp) {
           const responseDate = new Date(response.timestamp);
           // Check if valid date
           if (!isNaN(responseDate.getTime())) {
