@@ -20,7 +20,6 @@ export const ChatInterface = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  // Scroll to bottom when messages change
   useEffect(() => {
     scrollToBottom();
   }, [messages, isTyping]);
@@ -31,12 +30,9 @@ export const ChatInterface = () => {
     }
   };
 
-  // Send a message to the AWS API Gateway and handle the response
   const handleSendMessage = async (text: string) => {
-    // Reset any previous errors
     setError(null);
     
-    // Add user message
     const userMessage: MessageType = {
       id: Date.now().toString(),
       text,
@@ -46,47 +42,54 @@ export const ChatInterface = () => {
     
     setMessages(prev => [...prev, userMessage]);
     
-    // Show typing indicator
     setIsTyping(true);
     
     try {
-      // Call the AWS API Gateway with the structured request format
       const response = await sendChatMessage(text);
       console.log(response);
-      // Create bot message from API response
+      
+      let messageText = "No response received";
+      
+      try {
+        if (response.body) {
+          const bodyContent = typeof response.body === 'string' 
+            ? JSON.parse(response.body) 
+            : response.body;
+            
+          messageText = bodyContent.response || "No message in response";
+        }
+      } catch (parseError) {
+        console.error('Error parsing response body:', parseError);
+        messageText = "Error parsing response";
+      }
+      
       const botMessage: MessageType = {
         id: (Date.now() + 1).toString(),
-        text: response.message,
+        text: messageText,
         sender: 'bot',
-        timestamp: new Date() // Use current date as fallback
+        timestamp: new Date()
       };
       
-      // Try to use the timestamp from response if it exists and is valid
       try {
         if (response.timestamp) {
           const responseDate = new Date(response.timestamp);
-          // Check if valid date
           if (!isNaN(responseDate.getTime())) {
             botMessage.timestamp = responseDate;
           }
         }
       } catch (err) {
         console.error('Error parsing timestamp from response:', err);
-        // Keep the fallback timestamp
       }
       
-      // Hide typing indicator and add bot message
       setIsTyping(false);
       setMessages(prev => [...prev, botMessage]);
       
-      // Show toast notification
       toast({
         title: "New message",
         description: "AI assistant has responded to your query",
         duration: 2000,
       });
     } catch (err) {
-      // Handle errors
       setIsTyping(false);
       setError("Sorry, I couldn't process your request. Please try again.");
       
@@ -103,12 +106,10 @@ export const ChatInterface = () => {
 
   return (
     <div className="flex flex-col w-full h-full max-w-3xl mx-auto">
-      {/* Header */}
       <div className="glass-effect border-b p-4 rounded-t-xl">
         <h1 className="text-xl font-semibold text-center">AI Assistant</h1>
       </div>
       
-      {/* Messages Container */}
       <div className="flex-1 overflow-y-auto p-4 scrollbar-slim">
         <div className="space-y-2">
           {messages.map((message, index) => (
@@ -127,12 +128,10 @@ export const ChatInterface = () => {
             </div>
           )}
           
-          {/* This div is used to scroll to the bottom */}
           <div ref={messagesEndRef} />
         </div>
       </div>
       
-      {/* Input Area */}
       <div className="p-4 border-t">
         <ChatInput 
           onSendMessage={handleSendMessage} 
