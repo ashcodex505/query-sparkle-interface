@@ -106,7 +106,7 @@ export const ChatInterface = () => {
     <div className="flex flex-col w-full h-full max-w-3xl mx-auto">
       {/* Header */}
       <div className="glass-effect border-b p-4 rounded-t-xl">
-        <h1 className="text-xl font-semibold text-center">AI Assistant</h1>
+        <h1 className="text-xl font-semibold text-center">PriceSift</h1>
       </div>
       
       {/* Messages Container */}
