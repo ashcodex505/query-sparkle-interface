@@ -53,10 +53,11 @@ export const ChatInterface = () => {
       // Call the AWS API Gateway with the structured request format
       const response = await sendChatMessage(text);
       console.log(response);
+      const parsedBody = JSON.parse(response.body);
       // Create bot message from API response
       const botMessage: MessageType = {
         id: (Date.now() + 1).toString(),
-        text: response.Object.body,
+        text: parsedBody,
         sender: 'bot',
         timestamp: new Date() // Use current date as fallback
       };
