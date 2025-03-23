@@ -33,7 +33,7 @@ export const sendChatMessage = async (message: string): Promise<ChatResponse> =>
     //   promptSessionAttributes: {}
     // };
     const requestBody = {
-      "key1": "Google shopping"
+      "key1": message
     }
 
     const response = await fetch(API_ENDPOINT, {
