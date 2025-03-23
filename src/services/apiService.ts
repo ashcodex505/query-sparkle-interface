@@ -19,19 +19,22 @@ export interface ApiRequestParameters {
 export const sendChatMessage = async (message: string): Promise<ChatResponse> => {
   try {
     // Structure the request body according to the required format
+    // const requestBody = {
+    //   apiPath: "/weather",
+    //   actionGroup: "get_weather",
+    //   httpMethod: "GET",
+    //   parameters: [
+    //     {
+    //       name: "city",
+    //       value: message // Using the message as the city value
+    //     }
+    //   ],
+    //   sessionAttributes: {},
+    //   promptSessionAttributes: {}
+    // };
     const requestBody = {
-      apiPath: "/weather",
-      actionGroup: "get_weather",
-      httpMethod: "GET",
-      parameters: [
-        {
-          name: "city",
-          value: message // Using the message as the city value
-        }
-      ],
-      sessionAttributes: {},
-      promptSessionAttributes: {}
-    };
+      "key1": "Google shopping"
+    }
 
     const response = await fetch(API_ENDPOINT, {
       method: 'POST',
